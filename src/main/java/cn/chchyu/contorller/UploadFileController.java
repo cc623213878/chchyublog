@@ -26,7 +26,7 @@ import cn.chchyu.mapper.ArticleMapper;
 import cn.chchyu.model.Article;
 
 /*
- *  markdown文件上传
+ *  markdown文件夹上传
  *  上传的markdown文件中包含文章的描述注释信息:
  *  
  *  <!--blog
@@ -50,8 +50,14 @@ public class UploadFileController {
 	@Autowired ArticleMapper articleMapper;
 	@RequestMapping("/uploadfile")
 	public String uploadfile(@RequestParam("file") MultipartFile[] file,RedirectAttributes attributes) {
+		if (file[0].isEmpty()) {
+			attributes.addFlashAttribute("messagenum", 1);
+			attributes.addFlashAttribute("message", "文件上传失败，请选择文件！");
+			return "redirect:AddArticle";
+        }
+		
 		String regEx = ".*\\.md";
-		String regheader = "<!--blog[\\s\\S]*blog--	>";
+		String regheader = "<!--blog[\\s\\S]*blog-->";
         File file1 = null;
         File file2 = null;
 		byte[] buffer = new byte[1024];
@@ -72,7 +78,6 @@ public class UploadFileController {
                 file2= new File(ResourceUtils.getURL("").getPath()+name+".temp");
                 MessageDigest md1 = MessageDigest.getInstance("MD5");
                 MessageDigest md2 = MessageDigest.getInstance("MD5");
-                
                 //服务器存在相同文件名
                 if (file1.exists()) {
                 	//文件名相同
@@ -105,38 +110,43 @@ public class UploadFileController {
                          }                  
 					}
                 } 
+                makeDir(ResourceUtils.getURL("").getPath()+name);
                 f.transferTo(file1);
            	 	matcher = pattern.matcher(name);
                 //如果是。md文件则解析markdown文件
-                if ( matcher.matches()) {
+                if (matcher.matches()) {
                 	Article article=new Article();
                 	FileInputStream fin=new FileInputStream(file1);
                 	InputStreamReader in=new InputStreamReader(fin);
                 	BufferedReader reader =new BufferedReader(in);
+                	temp="";
                     while ((line=reader.readLine())!=null) {  
                         temp+=line+"\n";
                     }
-                    reader.close();
-                    article.setContent(MdToHtml.toHtml(temp));
                 	//匹配markdown文件中文章描述 （title，described） 
                 	matcher=paheader.matcher(temp);
                 	//如果有文章描述就保存，没有就不保存
                 	if(matcher.find()) {
+                		article.setContent(MdToHtml.toHtml(temp,name.split("/",2)[0]));
 	                	temp=matcher.group();
 	                	temp=temp.substring(9,temp.length()-8); 
-	                	temp=temp.replaceAll("\u200b", "");//从文件中读取的一个不显示字符，不去掉会报错
+	                	temp=temp.replaceAll("\u200b", "");//从文件中读取的一个不显示字符，不去掉会报错 
 	                	
 	                	JSONObject jsonObject=new JSONObject(temp);
+	                	
 	                	described=jsonObject.getString("described");
 	                	title=jsonObject.getString("title");
 	                	
 						article.setDescribed(described);
 						article.setTitle(title);
+
 						SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd");
 						article.setTime(ft.format(new Date()));
 						article.setMdfile(name);
 						articleMapper.save(article);
+						reader.close();
                 	}else {
+                		reader.close();
                 		file1.delete();
                 		messagenum++;
                 		message+="["+file1.getName()+"] 文章头描述错误，上传失败\\n";

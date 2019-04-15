@@ -28,12 +28,8 @@
         <header>
             <h3>点击热门</h3>
         </header>
-        <ul>
-            <li><a href="#">Nothing happened</a></li>
-            <li><a href="#">My Dearest Cthulhu</a></li>
-            <li><a href="#">The Meme Meme</a></li>
-            <li><a href="#">Now Full Cyborg</a></li>
-            <li><a href="#">Temporal Flux</a></li>
+        <ul id="hotArticle">
+
         </ul>
     </section>
 
@@ -69,6 +65,17 @@
 
 </div>
 <script>
+    $.getJSON('/API/HotArticle', function (json) {
+        for (i = 0; i < json.article.length; i++) {
+            if (json.article[i].title.length > 22)
+                str = '...';
+            else
+                str = '';
+            $('#hotArticle').append('<li><a href="/ArticleView?mdfile=' +
+                json.article[i].mdfile + '">' +
+                json.article[i].title.substring(0, 22) + str + '</a></li>');
+        }
+    });
     //判断闰年
     function runNian(_year) {
         if (_year % 400 === 0 || (_year % 4 === 0 && _year % 100 !== 0)) {

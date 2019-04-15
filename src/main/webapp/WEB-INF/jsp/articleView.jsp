@@ -46,7 +46,9 @@
                             <li><a href="#" class="link-icon24 link-icon24-1">16</a></li>
                         </ul>
                     </div>
-                    ${article.content}
+                    <div id="contentview">
+                        ${article.content}
+                    </div>
                 </article>
             </div>
         </div>

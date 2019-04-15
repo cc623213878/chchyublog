@@ -19,7 +19,7 @@ import cn.chchyu.model.Article;
 
 @Controller
 public class ArticleController {
-@Autowired ArticleMapper articleMapper;
+	@Autowired ArticleMapper articleMapper;
 	
 	@RequestMapping({"/","index"})
 	public String listArticle(Model m,@RequestParam(value = "start", defaultValue = "0") int start,@RequestParam(value = "size", defaultValue = "5") int size) throws Exception{
@@ -33,6 +33,7 @@ public class ArticleController {
 	@RequestMapping("/ArticleView")
 	public String articleView(HttpServletRequest request,Model m) {
 		String mdfile=request.getParameter("mdfile");
+		articleMapper.viewArticle(mdfile);
 		Article article=articleMapper.findByid(mdfile);
 		m.addAttribute("article",article);
 		return "articleView";

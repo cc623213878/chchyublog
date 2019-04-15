@@ -1,4 +1,16 @@
-### chchyublog
+## chchyublog
+
+使用mysql数据库
+
+新建一个数据库：myblog
+
+sql文件：myblog.sql（带测试数据）
+
+
+
+#### 上传页面：你的网址/AddArticle
+
+
 
 在本地新建一个存储markdown的blog文件夹（包括图片，图片只用相对路径）
 

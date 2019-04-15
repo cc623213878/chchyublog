@@ -26,7 +26,7 @@
 	   described:文章的概述或介绍
 	</div>
     <form action="uploadfile" method="post" enctype="multipart/form-data">
-        <input id="dir" value="选择文件夹" type="file" name="file" accept="." webkitdirectory mozdirectory /> </br>
+        <input id="dir"  type="file" name="file"  webkitdirectory mozdirectory /> </br>
         <input type="submit" value="提交文件夹">
     </form>
     <c:if test="${messagenum>0}">
